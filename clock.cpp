@@ -20,7 +20,8 @@
 // 2022-10-12  switch to gtkmm
 // 2022-10-14  finish and fine tune as a C++ example
 // 2022-10-17  add css compile error reporting
-//
+// 2022-10-26  add code for Z duration (new today)
+
 // For Eclipse this requires the pkg-config plugin
 //   Help | Eclipse Market place
 //   put pkg-config in the search box | Go
@@ -29,7 +30,7 @@
 //   Project | Properties | C++ Build | Settings
 //     Pkg-config (initially an off screen to the right tab)
 //     check gtk-3.0 and gtkmm-3.0  | Apply and continue
-
+//
 //==============================================================================
 
 #include <gtkmm/application.h>
@@ -193,9 +194,10 @@ public:
 	// update the calendar
 	void setCalendar()
 	{
-		// The events file has three sorts of entries, all day, timed and errors
+		// The events file has four sorts of entries, all day, timed and errors
 		// 2022-10-13 Exercise\n
 		// 2022-10-13T12:00:00+01:00 Lunch with Robin\n
+		// 2022-11-01T21:00:00Z Recycling  (first seen 26/10/2022)
 		// * something bad happened\n
 		
 #define CALDIR	"/home/pi/calendar"
@@ -208,7 +210,8 @@ public:
 				unlink(responseFile);
 				unlink(eventsFile);
 				char command[100];
-				sprintf(command, "python clock.py > %s", responseFile);
+				sprintf(command, "python clock.py 2> %s", responseFile);
+		std::cout <<  command << std::endl;
 				system(command);
 				exit(0);		// kill the forked thread
 			}
@@ -241,7 +244,9 @@ public:
 							// copy the start time but discard the duration
 							while(j<19) text2[k++] = text1[j++];
 							text2[k++] = ' ';
-							j+=7;
+							// is it a '+' time or a Z time?
+							if(text1[j]=='+') j += 7;
+							else              j += 2;
 						}
 						// copy the event text
 						while(text1[j] && text1[j]!='\n')
@@ -261,22 +266,31 @@ public:
 			else{			// if the events file failed to open
 				FILE* f2 = fopen(responseFile, "r");
 				if(f2){
-					char buffer[20];
-					if(fgets(buffer, sizeof(buffer), f2)
-								&& strncmp(buffer, "Please visit", 12)==0){
-						slot[i].set_name("sval1");		// red
-						slot[i++].set_text("** Token refresh time **");
+					char buffer[200];
+					while(i==0 && fgets(buffer, sizeof(buffer), f2)){
+						if(strstr(buffer, "Token has been expired")!=nullptr){
+							slot[i++].set_text("** Token refresh time **");
+							slot[i].set_name("sval1");		// red
+							slot[i++].set_text("  cd calendar");
+							slot[i].set_name("sval1");		// red
+							slot[i++].set_text("  rm token.json");
+							slot[i].set_name("sval1");		// red
+							slot[i++].set_text("  python clock.py");
+							slot[i].set_name("sval1");		// red
+							slot[i++].set_text("  wait for the browser and agree");
+							slot[i].set_name("sval1");		// red
+						}
 					}
 					fclose(f2);
 				}
-				else if(i==0){						// response file failed too
-					slot[i].set_name("sval1");		// red
-					slot[i++].set_text("** Data failed to fetch **");					
-				}
+			}
+			if(i==0){						// response file failed too
+				slot[i].set_name("sval1");		// red
+				slot[i++].set_text("** Data failed to fetch **");					
 			}
 			for( ; i<5; ++i){			// blank the rest of the display
 				slot[i].set_name("sval2");
-				slot[i].set_text("");
+				slot[i].set_text("**");
 			}
 		}
 	}

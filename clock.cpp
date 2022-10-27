@@ -31,7 +31,7 @@
 // 2022-10-14  finish and fine tune as a C++ example
 // 2022-10-17  add css compile error reporting
 // 2022-10-26  add code for Z duration (seen new today)
-// 2022-10-27  add command arguments
+// 2022-10-27  add command arguments and lambdas
 //
 // For Eclipse this requires the pkg-config plugin
 //   Help | Eclipse Market place
@@ -95,16 +95,16 @@ static const char *css =
 class CLOCK : public Gtk::Window {
 protected:
 	// As there only one instance of CLOCK we can cheat the static/dynamic vibe
-	inline static CLOCK* self;
-	
+	inline static CLOCK* self{ nullptr };
+
 	// Member widgets:
 	Gtk::Fixed fixed;				// a widget container with fixed coordinates
 	Gtk::Button close, refresh;		// buttons
 	Gtk::Label time, day, date;		// blocks of text
 	Gtk::Label slot[5];				// more text for the calendar entries
 
-	bool bTest{false};				// used when testing
-	
+	bool bTest{ false };			// used when testing
+
 public:
 	CLOCK() = delete;							// no default constructor
 	CLOCK(Glib::RefPtr<Gtk::Application> app){	// the constructor for the window
@@ -112,7 +112,7 @@ public:
 		set_title("Pi-Clock");
 		set_border_width(10);
 
-		// Select the 'fixed' container so we get absolute coordinates.
+		// Select a 'fixed' container so we get absolute coordinates.
 		// Beware: the basic Gtk::Window can only contain one widget but this
 		// is a widget that contains lots of widgets
 		// My old screen is a 1440 x 900 - old but that's why it's on the clock
@@ -137,7 +137,7 @@ public:
 				GtkCssProvider *provider = gtk_css_provider_new();
 				gtk_css_provider_load_from_data(provider, css, -1, nullptr);
 			}
-			std::cout <<  "CssProviderError: error " << e.code() << std::endl;
+			std::cout << "CssProviderError: error " << e.code() << std::endl;
 			exit(1);
 		}
 		context->add_provider_for_screen(Gdk::Screen::get_default(),
@@ -153,7 +153,7 @@ public:
 		// Connect the buttons to their service routines as lambdas
 		close.signal_clicked().connect([this]{ return Gtk::Window::close(); });
 		refresh.signal_clicked().connect([this]{ Ticks = 12; });
-												
+
 		// And the command line argument receiver
 		// more messy as it is a static
 		app->signal_command_line().connect(
@@ -161,11 +161,11 @@ public:
 				int argc = 0;
 				char** argv = command_line->get_arguments(argc);
 				self->do_command(argc, argv);	// call a member function of CLOCK
-				
+
 				app->activate();	// beware: this is in the default
 									// on_command() so we must do it too
 				return 0;
-	     	}, false);
+			}, false);
 
 		// Set the buttons' texts and put them into the fixed container
 		close.set_label("Close");
@@ -188,7 +188,7 @@ public:
 		Glib::signal_timeout().connect([this]() { return this->tick(); }, 1000);
 	}
 	virtual ~CLOCK(){}		// default clean-ups only
-	
+
 	// receive the command args
 	void do_command(int argc, char* argv[])
 	{
@@ -197,7 +197,7 @@ public:
 				bTest = true;
 		}
 	}
-	
+
 	// Ticker at 1 per second
 	int Ticks{25};			// delay the first fetch for fifteen seconds
 	int Retries{0};			// limit the fast retries
@@ -205,7 +205,7 @@ public:
 
 	// Update the time, day and date
 	int oldDOW{9};			// used to trigger the refresh of day oriented
-	
+
 	void setDisplay()
 	{
 		char temp[30];
@@ -230,7 +230,7 @@ public:
 			sprintf(today, "%04d-%02d-%02d", 1900+t->tm_year, t->tm_mon+1, t->tm_mday);
 		}
 	}
-	
+
 	// Update the calendar
 	void setCalendar()
 	{
@@ -241,7 +241,7 @@ public:
 		// * something bad happened\n
 		// its stderr output are sent to response.edc so we can try
 		// and fail responsibly
-		
+
 #define CALDIR	"/home/pi/calendar"
 		const char* eventsFile   = CALDIR "/events.txt";
 		const char* responseFile = CALDIR "/response.edc";
@@ -332,7 +332,7 @@ public:
 			}
 			if(i==0){						// response file failed too
 				slot[i].set_name("sval1");	// red
-				slot[i++].set_text("** Data failed to fetch **");					
+				slot[i++].set_text("** Data failed to fetch **");
 			}
 			for( ; i<5; ++i){			// blank the rest of the display
 				slot[i].set_name("sval2");
@@ -356,12 +356,12 @@ int main(int argc, char *argv[])
 	// then we hook up a receiver callback in CLOCK to handle them
 	// This way gtkmm gets a first look at the args and act on and takes out
 	// those that belong to it and then passes the rest down to us.
-	
+
 	auto app = Gtk::Application::create(argc, argv, "clock.app",
 							Gio::APPLICATION_HANDLES_COMMAND_LINE);
-	
+
 	CLOCK Clock(app);
-	
+
 	// Show the window and returns when it is closed.
 	return app->run(Clock);
 }

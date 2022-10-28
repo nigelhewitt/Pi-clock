@@ -66,7 +66,7 @@ def main():
 
     except HttpError as error:
         print('An error occurred: %s' % error)
-        f.write('*An HTTP error occured \n* ')
+        f.write('* An HTTP error occurred *\n')
         f.write(error)
         f.write('\n')
 

@@ -3,7 +3,7 @@
 # name the target
 PROGRAM = clock
 
-# list the source files (as a list of a wild card)
+# list the source files (as a list or a wild card)
 #SRCS = clock.cpp
 SRCS = $(wildcard *.cpp)
 

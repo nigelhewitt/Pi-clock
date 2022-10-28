@@ -237,7 +237,7 @@ public:
 		// The events file has four sorts of entries, all day, timed and errors
 		// 2022-10-13 Exercise\n
 		// 2022-10-13T12:00:00+01:00 Lunch with Robin\n
-		// 2022-11-01T21:00:00Z Recycling  (first seen 26/10/2022)
+		// 2022-11-01T21:00:00Z Recycling\n             (first seen 26/10/2022)
 		// * something bad happened\n
 		// its stderr output are sent to response.edc so we can try
 		// and fail responsibly
@@ -264,7 +264,7 @@ public:
 			if(f){
 				char text1[200], text2[200];
 				for(; i<5 && fgets(text1, sizeof(text1), f); ++i){
-					// first process errors from Bongo.py
+					// first process errors from clock.py
 					if(text1[0]=='*'){
 						int n = strlen(text1);				// tidy
 						if(text1[n-1]=='\n') text1[n-1] = 0;

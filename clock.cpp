@@ -94,7 +94,7 @@ static const char *css =
 
 class CLOCK : public Gtk::Window {
 protected:
-	// As there only one instance of CLOCK we can cheat the static/dynamic vibe
+	// As there only one instance of CLOCK I can subvert the static/dynamic vibe
 	inline static CLOCK* self{ nullptr };
 
 	// Member widgets:
@@ -313,18 +313,18 @@ public:
 				FILE* f2 = fopen(responseFile, "r");
 				if(f2){
 					char buffer[200];
-					while(i==0 && fgets(buffer, sizeof(buffer), f2)){
+					while(i==0 && fgets(buffer, sizeof(buffer), f2)!=nullptr){
 						if(strstr(buffer, "Token has been expired")!=nullptr){
-							slot[i++].set_text("** Token refresh time **");
-							slot[i].set_name("sval1");		// red
-							slot[i++].set_text("  cd calendar");
-							slot[i].set_name("sval1");		// red
-							slot[i++].set_text("  rm token.json");
-							slot[i].set_name("sval1");		// red
-							slot[i++].set_text("  python clock.py");
-							slot[i].set_name("sval1");		// red
-							slot[i++].set_text("  wait for the browser and agree");
-							slot[i].set_name("sval1");		// red
+							slot[i].set_text("** Token refresh time **");
+							slot[i++].set_name("sval1");		// red
+							slot[i].set_text("   cd calendar");
+							slot[i++].set_name("sval1");		// red
+							slot[i].set_text("   rm token.json");
+							slot[i++].set_name("sval1");		// red
+							slot[i].set_text("   python clock.py");
+							slot[i++].set_name("sval1");		// red
+							slot[i].set_text("   wait for the browser and agree");
+							slot[i++].set_name("sval1");			// red
 						}
 					}
 					fclose(f2);

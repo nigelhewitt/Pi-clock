@@ -32,6 +32,7 @@
 // 2022-10-17  add css compile error reporting
 // 2022-10-26  add code for Z duration (seen new today)
 // 2022-10-27  add command arguments and lambdas
+// 2022-11-01  fix error reporting on token timeout
 //
 // For Eclipse this requires the pkg-config plugin
 //   Help | Eclipse Market place
@@ -324,7 +325,7 @@ public:
 							slot[i].set_text("   python clock.py");
 							slot[i++].set_name("sval1");		// red
 							slot[i].set_text("   wait for the browser and agree");
-							slot[i++].set_name("sval1");			// red
+							slot[i++].set_name("sval1");		// red
 						}
 					}
 					fclose(f2);

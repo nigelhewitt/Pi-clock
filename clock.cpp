@@ -133,7 +133,7 @@ public:
 			// error message. So, if it fails, recompile it with a more basal
 			// function that actually throws with a useful error description
 			// with line and column numbers.
-			// It will still throw but at least you get help to fix it
+			// It will still throw but at least you get a clue to fix it
 			if(e.code()==Gtk::CssProviderError::SYNTAX){
 				GtkCssProvider *provider = gtk_css_provider_new();
 				gtk_css_provider_load_from_data(provider, css, -1, nullptr);
@@ -205,7 +205,7 @@ public:
 	char today[12]{};		// used to colour the lines for 'today'
 
 	// Update the time, day and date
-	int oldDOW{9};			// used to trigger the refresh of day oriented
+	int oldDOW{9};			// trigger the refresh of day oriented stuff
 
 	void setDisplay()
 	{
@@ -232,7 +232,7 @@ public:
 		}
 	}
 
-	// Update the calendar
+	// Update the calendar display
 	void setCalendar()
 	{
 		// The events file has four sorts of entries, all day, timed and errors
@@ -240,7 +240,7 @@ public:
 		// 2022-10-13T12:00:00+01:00 Lunch with Robin\n
 		// 2022-11-01T21:00:00Z Recycling\n             (first seen 26/10/2022)
 		// * something bad happened\n
-		// its stderr output are sent to response.edc so we can try
+		// Its stderr output are sent to response.edc so we can try
 		// and fail responsibly
 
 #define CALDIR	"/home/pi/calendar"
@@ -352,11 +352,11 @@ public:
 
 int main(int argc, char *argv[])
 {
-	// Command line arguments are a pain under gtkmm so I will try to clean it.
+	// Command line arguments are a pain under gtkmm so I will try to explain.
 	// We add the APPLICATION_HANDLES_COMMAND_LINE flag so we get sent the args
 	// then we hook up a receiver callback in CLOCK to handle them
-	// This way gtkmm gets a first look at the args and act on and takes out
-	// those that belong to it and then passes the rest down to us.
+	// This way gtkmm gets a first look at the args and acts on and takes out
+	// those that belong to it and then passes the rest on down to us.
 
 	auto app = Gtk::Application::create(argc, argv, "clock.app",
 							Gio::APPLICATION_HANDLES_COMMAND_LINE);
